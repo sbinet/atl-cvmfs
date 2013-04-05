@@ -31,3 +31,4 @@ rather biggish ``DBRelease`` directory, to disable it:
 ```sh
 $ atl-cvmfs pkg-create -rel 17.2.10 -outdir=/some/where -with-dbrelease=0
 ```
+
