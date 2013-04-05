@@ -28,7 +28,7 @@ ex:
 	}
 	cmd.Flag.Bool("q", false, "quiet. only print error and warning messages, all other output will be suppressed")
 	cmd.Flag.String("rel", "", "release number to package up (e.g. 17.2.10)")
-	cmd.Flag.String("cmtcfg", "", "CMTCONFIG to use (default=${CMTCONFIG})")
+	cmd.Flag.String("cmtcfg", "${CMTCONFIG}", "CMTCONFIG to use (e.g. i686-slc5-gcc43-opt)")
 	cmd.Flag.String("cvmfsdir", "/cvmfs/atlas.cern.ch/repo/sw/software", "top directory under which all releases are located")
 	cmd.Flag.String("outdir", ".", "directory where to put the package tarball")
 	cmd.Flag.Bool("with-dbrelease", true, "include DBRelease in package tarball")
@@ -49,7 +49,7 @@ func acvmfs_run_cmd_pkg_create(cmd *commander.Command, args []string) {
 
 	quiet := cmd.Flag.Lookup("q").Value.Get().(bool)
 	release := cmd.Flag.Lookup("rel").Value.Get().(string)
-	cmtcfg := cmd.Flag.Lookup("cmtcfg").Value.Get().(string)
+	cmtcfg := os.ExpandEnv(cmd.Flag.Lookup("cmtcfg").Value.Get().(string))
 	cvmfsdir := cmd.Flag.Lookup("cvmfsdir").Value.Get().(string)
 	outdir := cmd.Flag.Lookup("outdir").Value.Get().(string)
 	withdbrelease := cmd.Flag.Lookup("with-dbrelease").Value.Get().(bool)
@@ -65,10 +65,8 @@ func acvmfs_run_cmd_pkg_create(cmd *commander.Command, args []string) {
 	}
 
 	if cmtcfg == "" {
-		cmtcfg = os.Getenv("CMTCONFIG")
-		if cmtcfg == "" {
-			cmtcfg = "i686-slc5-gcc43-opt"
-		}
+		cmtcfg = "i686-slc5-gcc43-opt"
+		fmt.Printf("%s: no (or invalid) CMTCONFIG. will use %s\n", n, cmtcfg)
 	}
 
 	if !quiet {
