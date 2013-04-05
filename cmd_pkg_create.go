@@ -31,7 +31,7 @@ ex:
 	cmd.Flag.String("cmtcfg", "", "CMTCONFIG to use (default=${CMTCONFIG})")
 	cmd.Flag.String("cvmfsdir", "/cvmfs/atlas.cern.ch/repo/sw/software", "top directory under which all releases are located")
 	cmd.Flag.String("outdir", ".", "directory where to put the package tarball")
-	cmd.Flag.Bool("with-dbrelease", false, "include DBRelease in package tarball")
+	cmd.Flag.Bool("with-dbrelease", true, "include DBRelease in package tarball")
 	return cmd
 }
 
