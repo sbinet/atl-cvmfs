@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"io/ioutil"
+	// "io"
+	// "io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -26,7 +26,7 @@ ex:
 		Flag: *flag.NewFlagSet("acvmfs-pkg-create", flag.ExitOnError),
 		//CustomFlags: true,
 	}
-	cmd.Flag.Bool("q", false, "only print error and warning messages, all other output will be suppressed")
+	cmd.Flag.Bool("q", false, "quiet. only print error and warning messages, all other output will be suppressed")
 	cmd.Flag.String("rel", "", "release number to package up (e.g. 17.2.10)")
 	cmd.Flag.String("cmtcfg", "", "CMTCONFIG to use (default=${CMTCONFIG})")
 	cmd.Flag.String("cvmfsdir", "/cvmfs/atlas.cern.ch/repo/sw/software", "top directory under which all releases are located")
@@ -72,7 +72,7 @@ func acvmfs_run_cmd_pkg_create(cmd *commander.Command, args []string) {
 	}
 
 	if !quiet {
-		fmt.Printf("%s: creating package for release [%s-%s]...\n",
+		fmt.Printf("%s: creating package [athena-%s-%s]...\n",
 			n, release, cmtcfg)
 	}
 
@@ -87,17 +87,27 @@ func acvmfs_run_cmd_pkg_create(cmd *commander.Command, args []string) {
 		handle_err(err)
 	}
 
-	workdir, err := ioutil.TempDir("", "atl-cvmfs-")
+	// handle env. vars in case the shell didn't do it already
+	outdir = os.ExpandEnv(outdir)
+	outdir, err = filepath.Abs(outdir)
 	handle_err(err)
-	defer os.RemoveAll(workdir)
+
+	// workdir, err := ioutil.TempDir("", "atl-cvmfs-")
+	// handle_err(err)
+	// defer os.RemoveAll(workdir)
 
 	pkgname := fmt.Sprintf("athena-%s-%s.tar.gz", release, cmtcfg)
-	targ := filepath.Join(workdir, pkgname)
+	targ := filepath.Join(outdir, pkgname)
 
 	if !quiet {
 		fmt.Printf("%s: swdir=   %s\n", n, swdir)
-		fmt.Printf("%s: workdir= %s\n", n, workdir)
+		fmt.Printf("%s: outdir=  %s\n", n, outdir)
 		fmt.Printf("%s: pkgname= %s\n", n, pkgname)
+	}
+
+	if !path_exists(outdir) {
+		err = os.MkdirAll(outdir, 0700)
+		handle_err(err)
 	}
 
 	extra_args := []string{}
@@ -107,21 +117,25 @@ func acvmfs_run_cmd_pkg_create(cmd *commander.Command, args []string) {
 	err = _tar_gz(targ, swdir, extra_args)
 	handle_err(err)
 
-	src, err := os.Open(targ)
-	handle_err(err)
-	defer src.Close()
+	// src, err := os.Open(targ)
+	// handle_err(err)
+	// defer src.Close()
 
-	dst, err := os.Create(filepath.Join(outdir, pkgname))
-	handle_err(err)
-	defer dst.Close()
+	// dst, err := os.Create(filepath.Join(outdir, pkgname))
+	// handle_err(err)
+	// defer dst.Close()
 
-	_, err = io.Copy(dst, src)
-	handle_err(err)
-	err = dst.Sync()
-	handle_err(err)
-	err = dst.Close()
-	handle_err(err)
+	// _, err = io.Copy(dst, src)
+	// handle_err(err)
+	// err = dst.Sync()
+	// handle_err(err)
+	// err = dst.Close()
+	// handle_err(err)
 
+	if !quiet {
+		fmt.Printf("%s: creating package [athena-%s-%s]... [OK]\n",
+			n, release, cmtcfg)
+	}
 	return
 }
 
